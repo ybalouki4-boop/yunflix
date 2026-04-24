@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YUNFLIX</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E50914;
+    --dark-red: #b0060f;
+    --black: #0a0a0a;
+    --dark: #141414;
+    --card: #1a1a1a;
+    --gray: #808080;
+    --light: #e5e5e5;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--black);
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== LOGIN PAGE ===== */
+  #loginPage {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  #loginPage::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(229,9,20,0.15) 0%, transparent 70%);
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.5;transform:translateX(-50%) scale(1)} 50%{opacity:1;transform:translateX(-50%) scale(1.1)} }
+
+  .login-box {
+    background: rgba(20,20,20,0.95);
+    border: 1px solid rgba(229,9,20,0.3);
+    border-radius: 12px;
+    padding: 48px 40px;
+    width: 420px;
+    max-width: 95vw;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 60px rgba(229,9,20,0.2);
+    animation: fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+  .login-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 52px;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    color: white;
+  }
+  .login-logo span { color: var(--red); }
+
+  .login-subtitle { color: var(--gray); font-size: 14px; margin-bottom: 32px; }
+
+  .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: white;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+  }
+  .google-btn:hover { background: #f5f5f5; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .google-btn svg { width: 22px; height: 22px; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--gray); font-size: 13px; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+
+  .input-group { margin-bottom: 14px; text-align: right; }
+  .input-group input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 13px 16px;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus { border-color: var(--red); }
+  .input-group input::placeholder { color: var(--gray); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .login-btn:hover { background: var(--dark-red); transform: translateY(-2px); }
+
+  /* ===== NAVBAR ===== */
+  #navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent 100%);
+    padding: 16px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s;
+  }
+  #navbar.scrolled { background: rgba(10,10,10,0.98); }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    letter-spacing: 3px;
+    color: white;
+    cursor: pointer;
+  }
+  .nav-logo span { color: var(--red); }
+
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+
+  .nav-search-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 7px 14px;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+  .nav-search-bar:focus-within { border-color: white; background: rgba(0,0,0,0.8); }
+  .nav-search-bar input { background: none; border: none; color: white; outline: none; font-family: 'Cairo', sans-serif; font-size: 13px; width: 160px; }
+  .nav-search-bar input::placeholder { color: var(--gray); }
+
+  .hamburger-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+  .hamburger-btn span { display: block; width: 24px; height: 2px; background: white; border-radius: 2px; transition: 0.3s; }
+
+  .nav-fav-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-fav-btn:hover { color: var(--red); }
+
+  /* ===== SIDEBAR MENU ===== */
+  #sidebar {
+    position: fixed;
+    top: 0; right: -300px;
+    width: 280px; height: 100vh;
+    background: rgba(15,15,15,0.98);
+    border-left: 1px solid rgba(229,9,20,0.3);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    padding: 80px 0 40px;
+    backdrop-filter: blur(20px);
+  }
+  #sidebar.open { right: 0; }
+  #sidebarOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1999;
+  }
+  #sidebarOverlay.open { display: block; }
+
+  .sidebar-logo { font-family:'Bebas Neue',cursive; font-size:28px; text-align:center; margin-bottom:32px; color:white; }
+  .sidebar-logo span { color:var(--red); }
+
+  .sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 28px;
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border-right: 3px solid transparent;
+    cursor: pointer;
+  }
+  .sidebar-nav a:hover, .sidebar-nav a.active {
+    color: white;
+    background: rgba(229,9,20,0.1);
+    border-right-color: var(--red);
+  }
+  .sidebar-nav a .icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .sidebar-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 28px; }
+
+  /* ===== AD BANNER ===== */
+  .ad-banner {
+    background: linear-gradient(90deg, #1a0505, rgba(229,9,20,0.15), #1a0505);
+    border-top: 1px solid rgba(229,9,20,0.3);
+    border-bottom: 1px solid rgba(229,9,20,0.3);
+    padding: 10px 0;
+    overflow: hidden;
+    margin-top: 72px;
+  }
+  .ad-content {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    animation: scrollAd 20s linear infinite;
+    white-space: nowrap;
+    padding: 0 48px;
+  }
+  @keyframes scrollAd { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .ad-item { display: flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; }
+  .ad-item span { color: var(--red); font-weight: 700; }
+
+  /* ===== HERO ===== */
+  .hero {
+    height: 70vh;
+    min-height: 480px;
+    position: relative;
+    overflow: hidden;
+    margin-top: -72px;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a0505 40%, #0d0505 100%);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--black) 0%, transparent 50%);
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(229,9,20,0.03) 40px, rgba(229,9,20,0.03) 41px),
+                      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(229,9,20,0.03) 40px, rgba(229,9,20,0.03) 41px);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 48px;
+    padding-top: 72px;
+  }
+  .hero-text { max-width: 500px; animation: fadeIn 0.8s ease; }
+  .hero-badge { background: var(--red); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 3px; display: inline-block; margin-bottom: 12px; letter-spacing: 2px; }
+  .hero-title { font-family:'Bebas Neue',cursive; font-size: 64px; line-height: 1; margin-bottom: 12px; letter-spacing: 2px; }
+  .hero-desc { color: var(--gray); font-size: 14px; line-height: 1.7; margin-bottom: 24px; max-width: 380px; }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-play {
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-play:hover { background: rgba(255,255,255,0.85); transform: scale(1.03); }
+  .btn-info {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+  }
+  .btn-info:hover { background: rgba(255,255,255,0.25); }
+
+  /* ===== CONTENT SECTIONS ===== */
+  .content-wrap { padding: 0 48px 60px; }
+
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::before { content:''; width:4px; height:24px; background:var(--red); display:inline-block; border-radius:2px; }
+  .see-all { color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+  .see-all:hover { opacity: 0.7; }
+
+  .cards-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .cards-row::-webkit-scrollbar { display: none; }
+
+  /* TOP 10 */
+  .top10-row { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  .top10-row::-webkit-scrollbar { display: none; }
+
+  .top10-card {
+    position: relative;
+    flex-shrink: 0;
+    width: 200px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .top10-card:hover { transform: scale(1.05); z-index: 10; }
+  .top10-num {
+    position: absolute;
+    bottom: -10px;
+    right: -20px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 100px;
+    color: var(--black);
+    -webkit-text-stroke: 3px rgba(255,255,255,0.15);
+    line-height: 1;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+  .top10-img {
+    width: 150px;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    position: relative;
+    z-index: 1;
+    background: var(--card);
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .top10-card:hover .top10-img { border-color: var(--red); }
+
+  /* Regular cards */
+  .movie-card {
+    flex-shrink: 0;
+    width: 180px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+  }
+  .movie-card:hover { transform: scale(1.06); z-index: 10; }
+  .movie-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--card);
+    display: block;
+    transition: box-shadow 0.2s;
+  }
+  .movie-card:hover img { box-shadow: 0 8px 30px rgba(229,9,20,0.4); }
+  .movie-card-info { padding: 8px 4px 0; }
+  .movie-card-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .movie-card-meta { font-size: 11px; color: var(--gray); margin-top: 3px; }
+  .fav-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .movie-card:hover .fav-badge { opacity: 1; }
+  .fav-badge.active { opacity: 1; color: var(--red); }
+
+  /* ===== CATEGORIES PAGE ===== */
+  .page-header {
+    padding: 100px 48px 32px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 42px;
+    letter-spacing: 3px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .page-header .accent { color: var(--red); }
+
+  .cat-grid {
+    padding: 0 48px 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  /* ===== SEARCH PAGE ===== */
+  .search-bar-big {
+    padding: 100px 48px 32px;
+  }
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 14px 20px;
+    gap: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+    transition: border-color 0.2s;
+  }
+  .search-input-wrap:focus-within { border-color: var(--red); }
+  .search-input-wrap input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+  }
+  .search-results { padding: 0 48px 48px; }
+  .search-results h3 { font-size: 18px; margin-bottom: 16px; color: var(--gray); }
+  .search-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+
+  /* ===== FAVORITES PAGE ===== */
+  .fav-grid { padding: 0 48px 48px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+  .fav-empty { text-align: center; padding: 80px; color: var(--gray); }
+  .fav-empty .big-icon { font-size: 64px; margin-bottom: 16px; }
+
+  /* ===== ADD FILM PANEL (Admin) ===== */
+  #addFilmPage {
+    min-height: 100vh;
+    background: var(--black);
+    padding: 100px 48px 60px;
+  }
+  .admin-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid rgba(229,9,20,0.2);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 0 40px rgba(229,9,20,0.1);
+  }
+  .admin-form h2 { font-family:'Bebas Neue',cursive; font-size:32px; margin-bottom:6px; letter-spacing:2px; }
+  .admin-form p { color:var(--gray); font-size:13px; margin-bottom:28px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:var(--light); }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--red); }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  .form-group select option { background: var(--dark); color: white; }
+
+  .publish-btn {
+    width: 100%;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .publish-btn:hover { background: var(--dark-red); transform: translateY(-2px); }
+
+  .admin-code-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+  }
+  .admin-code-modal.open { display: flex; }
+  .code-box {
+    background: var(--card);
+    border: 2px solid var(--red);
+    border-radius: 12px;
+    padding: 40px;
+    width: 380px;
+    max-width: 95vw;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+  }
+  .code-box h3 { font-family:'Bebas Neue',cursive; font-size:28px; margin-bottom:8px; }
+  .code-box p { color:var(--gray); font-size:13px; margin-bottom:20px; }
+  .code-box input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 14px;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 22px;
+    text-align: center;
+    outline: none;
+    letter-spacing: 6px;
+    margin-bottom: 16px;
+  }
+  .code-error { color: var(--red); font-size: 13px; margin-bottom: 12px; display: none; }
+
+  /* ===== SUCCESS TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #1a1a1a;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 14px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 9999;
+    display: none;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .toast.show { display: block; }
+  .toast .t-icon { color: #4caf50; margin-left: 8px; }
+
+  /* ===== MODAL ===== */
+  #movieModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 4000;
+    align-items: center;
+    justify-content: center;
+  }
+  #movieModal.open { display: flex; }
+  .modal-box {
+    background: var(--dark);
+    border-radius: 12px;
+    width: 480px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+    border: 1px solid rgba(229,9,20,0.2);
+  }
+  .modal-img { width: 100%; height: 260px; object-fit: cover; border-radius: 12px 12px 0 0; background: var(--card); }
+  .modal-body { padding: 24px; }
+  .modal-title { font-family:'Bebas Neue',cursive; font-size:30px; letter-spacing:1px; margin-bottom:6px; }
+  .modal-meta { color: var(--gray); font-size: 13px; margin-bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .modal-cat { background: var(--red); color: white; font-size: 11px; padding: 3px 10px; border-radius: 3px; font-weight: 700; }
+  .modal-desc { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+  .modal-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-watch {
+    flex: 1;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-watch:hover { background: var(--dark-red); }
+  .btn-fav-modal {
+    background: rgba(255,255,255,0.08);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-fav-modal:hover { background: rgba(229,9,20,0.2); border-color: var(--red); }
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: var(--red); }
+  .modal-wrap { position: relative; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--gray);
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 20px;
+  }
+  footer span { color: var(--red); font-weight: 700; }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px) {
+    #navbar { padding: 14px 16px; }
+    .content-wrap { padding: 0 16px 48px; }
+    .hero-content { padding: 0 16px; padding-top: 72px; }
+    .hero-title { font-size: 42px; }
+    .page-header { padding: 90px 16px 24px; font-size: 30px; }
+    .cat-grid, .fav-grid, .search-results, .search-bar-big { padding-left: 16px; padding-right: 16px; }
+    #addFilmPage { padding: 90px 16px 48px; }
+    .admin-form { padding: 24px 20px; }
+    .nav-search-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="page active">
+  <div class="login-box">
+    <div class="login-logo"><span>Y</span>UNFLIX</div>
+    <p class="login-subtitle">شاهد أفضل الأفلام والمسلسلات بدون انقطاع</p>
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C44.38,35.285,48,30,48,24C48,22.659,47.862,21.35,47.611,20.083z"/></svg>
+      تسجيل الدخول بـ Google
+    </button>
+    <div class="divider">أو</div>
+    <div class="input-group"><input type="email" id="loginEmail" placeholder="البريد الإلكتروني"></div>
+    <div class="input-group"><input type="password" id="loginPass" placeholder="كلمة المرور"></div>
+    <button class="login-btn" onclick="loginManual()">دخول</button>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="appWrapper" style="display:none;">
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-logo" onclick="showPage('home')"><span>Y</span>UNFLIX</div>
+    <div class="nav-right">
+      <div class="nav-search-bar">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="ابحث..." oninput="liveSearch(this.value)" onfocus="showPage('search')">
+      </div>
+      <button class="nav-fav-btn" onclick="showPage('favorites')" title="المفضلة">♥</button>
+      <button class="hamburger-btn" onclick="toggleSidebar()" id="hamburgerBtn">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div id="sidebar">
+    <div class="sidebar-logo"><span>Y</span>UNFLIX</div>
+    <nav class="sidebar-nav">
+      <a onclick="showPage('home');toggleSidebar()" id="nav-home"><span class="icon">🏠</span> الرئيسية</a>
+      <a onclick="showPage('movies');toggleSidebar()" id="nav-movies"><span class="icon">🎬</span> أفلام</a>
+      <a onclick="showPage('series');toggleSidebar()" id="nav-series"><span class="icon">📺</span> مسلسلات</a>
+      <a onclick="showPage('tvshow');toggleSidebar()" id="nav-tvshow"><span class="icon">📡</span> TV Show</a>
+      <a onclick="showPage('anime');toggleSidebar()" id="nav-anime"><span class="icon">⛩️</span> أنيمي</a>
+      <a onclick="showPage('kids');toggleSidebar()" id="nav-kids"><span class="icon">🧸</span> أطفال</a>
+      <a onclick="showPage('documentary');toggleSidebar()" id="nav-documentary"><span class="icon">🌍</span> وثائقي</a>
+      <div class="sidebar-divider"></div>
+      <a onclick="showPage('search');toggleSidebar()" id="nav-search"><span class="icon">🔍</span> البحث</a>
+      <a onclick="showPage('favorites');toggleSidebar()" id="nav-favorites"><span class="icon">❤️</span> المفضلة</a>
+      <div class="sidebar-divider"></div>
+      <a onclick="showAdminModal();toggleSidebar()"><span class="icon">➕</span> إضافة فيلم / مسلسل</a>
+    </nav>
+  </div>
+
+  <!-- AD BANNER -->
+  <div class="ad-banner">
+    <div class="ad-content" id="adContent">
+      <div class="ad-item">🎬 <span>جديد!</span> شاهد أحدث الأفلام على YUNFLIX</div>
+      <div class="ad-item">📺 <span>حصري!</span> أفضل المسلسلات العالمية</div>
+      <div class="ad-item">⛩️ <span>أنيمي!</span> أحدث حلقات الأنيمي</div>
+      <div class="ad-item">🌟 <span>Top 10</span> أفضل 10 أفلام هذا الأسبوع</div>
+      <div class="ad-item">🎬 <span>جديد!</span> شاهد أحدث الأفلام على YUNFLIX</div>
+      <div class="ad-item">📺 <span>حصري!</span> أفضل المسلسلات العالمية</div>
+    </div>
+  </div>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div id="homePage" class="page">
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">🔥 الأكثر مشاهدة اليوم</div>
+          <div class="hero-title" id="heroTitle">YUNFLIX ORIGINALS</div>
+          <p class="hero-desc" id="heroDesc">اكتشف أفضل الأفلام والمسلسلات العالمية بجودة عالية وبدون انقطاع. مرحباً بك في عالم الترفيه الرقمي!</p>
+          <div class="hero-btns">
+            <button class="btn-play">▶ مشاهدة الآن</button>
+            <button class="btn-info" onclick="showPage('movies')">📋 المزيد</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Top 10 أفلام اليوم</div>
+          <a class="see-all" onclick="showPage('movies')">عرض الكل ←</a>
+        </div>
+        <div class="top10-row" id="top10Movies"></div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Top 10 مسلسلات اليوم</div>
+          <a class="see-all" onclick="showPage('series')">عرض الكل ←</a>
+        </div>
+        <div class="top10-row" id="top10Series"></div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">مضاف حديثاً</div>
+          <a class="see-all" onclick="showPage('movies')">عرض الكل ←</a>
+        </div>
+        <div class="cards-row" id="recentAdded"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CATEGORY PAGES ===== -->
+  <div id="moviesPage" class="page">
+    <div class="page-header">🎬 <span class="accent">أفلام</span></div>
+    <div class="cat-grid" id="moviesGrid"></div>
+  </div>
+  <div id="seriesPage" class="page">
+    <div class="page-header">📺 <span class="accent">مسلسلات</span></div>
+    <div class="cat-grid" id="seriesGrid"></div>
+  </div>
+  <div id="tvshowPage" class="page">
+    <div class="page-header">📡 <span class="accent">TV Show</span></div>
+    <div class="cat-grid" id="tvshowGrid"></div>
+  </div>
+  <div id="animePage" class="page">
+    <div class="page-header">⛩️ <span class="accent">أنيمي</span></div>
+    <div class="cat-grid" id="animeGrid"></div>
+  </div>
+  <div id="kidsPage" class="page">
+    <div class="page-header">🧸 <span class="accent">أطفال</span></div>
+    <div class="cat-grid" id="kidsGrid"></div>
+  </div>
+  <div id="documentaryPage" class="page">
+    <div class="page-header">🌍 <span class="accent">وثائقي</span></div>
+    <div class="cat-grid" id="documentaryGrid"></div>
+  </div>
+
+  <!-- ===== SEARCH PAGE ===== -->
+  <div id="searchPage" class="page">
+    <div class="search-bar-big">
+      <div class="search-input-wrap">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="bigSearchInput" placeholder="ابحث عن فيلم أو مسلسل..." oninput="liveSearch(this.value)">
+      </div>
+    </div>
+    <div class="search-results">
+      <h3 id="searchLabel">ابحث عن أي شيء...</h3>
+      <div class="search-grid" id="searchGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===== FAVORITES PAGE ===== -->
+  <div id="favoritesPage" class="page">
+    <div class="page-header">❤️ <span class="accent">المفضلة</span></div>
+    <div id="favContent"></div>
+  </div>
+
+  <!-- ===== ADD FILM PAGE (Admin) ===== -->
+  <div id="addFilmPage" class="page">
+    <div class="admin-form">
+      <h2>➕ إضافة محتوى</h2>
+      <p>أضف فيلم أو مسلسل جديد — سيظهر فوراً للجميع</p>
+      <div class="form-group">
+        <label>عنوان الفيلم / المسلسل *</label>
+        <input type="text" id="addTitle" placeholder="اكتب العنوان هنا...">
+      </div>
+      <div class="form-group">
+        <label>التصنيف *</label>
+        <select id="addCat">
+          <option value="">-- اختر التصنيف --</option>
+          <option value="movie">🎬 فيلم</option>
+          <option value="series">📺 مسلسل</option>
+          <option value="tvshow">📡 TV Show</option>
+          <option value="anime">⛩️ أنيمي</option>
+          <option value="kids">🧸 أطفال</option>
+          <option value="documentary">🌍 وثائقي</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>رابط الصورة (Poster) *</label>
+        <input type="url" id="addImg" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>رابط المشاهدة (Lien Film) *</label>
+        <input type="url" id="addLink" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>الوصف</label>
+        <textarea id="addDesc" placeholder="وصف الفيلم أو المسلسل..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>السنة</label>
+        <input type="text" id="addYear" placeholder="2024">
+      </div>
+      <button class="publish-btn" onclick="publishContent()">
+        🚀 نشر الآن
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>YUNFLIX</span> 2026 R — جميع الحقوق محفوظة
+  </footer>
+
+</div>
+
+<!-- ===== ADMIN CODE MODAL ===== -->
+<div class="admin-code-modal" id="adminCodeModal">
+  <div class="code-box">
+    <h3>🔐 كود المشرف</h3>
+    <p>هذه الخاصية محمية — أدخل الكود للمتابعة</p>
+    <input type="password" id="adminCodeInput" placeholder="● ● ● ●" maxlength="4" oninput="checkAdminCode()">
+    <div class="code-error" id="codeError">❌ كود خاطئ! جاري التوجيه...</div>
+    <button class="login-btn" style="margin-top:4px" onclick="closeAdminModal()">إلغاء</button>
+  </div>
+</div>
+
+<!-- MOVIE MODAL -->
+<div id="movieModal">
+  <div class="modal-wrap">
+    <div class="modal-box" id="modalBox">
+      <img id="modalImg" class="modal-img" src="" alt="">
+      <div class="modal-body">
+        <div class="modal-meta" id="modalMeta"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div class="modal-btns">
+          <a id="modalWatch" class="btn-watch" href="#" target="_blank">▶ مشاهدة الآن</a>
+          <button class="btn-fav-modal" id="modalFavBtn" onclick="toggleFavModal()">❤ المفضلة</button>
+        </div>
+      </div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="t-icon">✅</span> <span id="toastMsg"></span>
+</div>
+
+<script>
+// ===== DATA =====
+let allContent = JSON.parse(localStorage.getItem('yunflix_content') || '[]');
+let favorites = JSON.parse(localStorage.getItem('yunflix_favs') || '[]');
+let currentUser = null;
+let currentModalItem = null;
+
+// Default content
+const defaultContent = [
+  {id:1,title:"Inception",cat:"movie",img:"https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",link:"#",desc:"رجل يُزرع أفكاراً في عقول الآخرين خلال أحلامهم.",year:"2010"},
+  {id:2,title:"The Dark Knight",cat:"movie",img:"https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",link:"#",desc:"باتمان يواجه الجوكر في معركة الخير والشر.",year:"2008"},
+  {id:3,title:"Interstellar",cat:"movie",img:"https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",link:"#",desc:"رحلة عبر الزمكان لإنقاذ البشرية.",year:"2014"},
+  {id:4,title:"Avengers: Endgame",cat:"movie",img:"https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",link:"#",desc:"الأبطال الخارقون يواجهون ثانوس في المعركة الأخيرة.",year:"2019"},
+  {id:5,title:"Spider-Man",cat:"movie",img:"https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",link:"#",desc:"بيتر باركر يصبح الرجل العنكبوت.",year:"2021"},
+  {id:6,title:"Dune",cat:"movie",img:"https://image.tmdb.org/t/p/w500/d5NXSklpcvkCgnpLIOved6kwGrM.jpg",link:"#",desc:"ملحمة علمية خيالية في عالم صحراوي.",year:"2021"},
+  {id:7,title:"Breaking Bad",cat:"series",img:"https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",link:"#",desc:"أستاذ كيمياء يتحول إلى ملك المخدرات.",year:"2008"},
+  {id:8,title:"Stranger Things",cat:"series",img:"https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",link:"#",desc:"مجموعة أطفال يكتشفون عالماً خفياً.",year:"2016"},
+  {id:9,title:"Game of Thrones",cat:"series",img:"https://image.tmdb.org/t/p/w500/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg",link:"#",desc:"صراع الملوك والعروش في عالم خيالي.",year:"2011"},
+  {id:10,title:"The Crown",cat:"series",img:"https://image.tmdb.org/t/p/w500/1M876KPjulVwppEpldhdc8V4o68.jpg",link:"#",desc:"قصة الأسرة الملكية البريطانية.",year:"2016"},
+  {id:11,title:"Attack on Titan",cat:"anime",img:"https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",link:"#",desc:"البشر يحاربون العمالقة خلف الأسوار.",year:"2013"},
+  {id:12,title:"Demon Slayer",cat:"anime",img:"https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",link:"#",desc:"شاب يصبح صياد شياطين لإنقاذ أخته.",year:"2019"},
+  {id:13,title:"Toy Story",cat:"kids",img:"https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPiv0Wjeg.jpg",link:"#",desc:"مغامرات الألعاب في عالم خيالي.",year:"1995"},
+  {id:14,title:"Planet Earth",cat:"documentary",img:"https://image.tmdb.org/t/p/w500/6LZb9F7wMkOPK2IXVS5xw9UREm0.jpg",link:"#",desc:"رحلة استكشافية حول طبيعة الأرض.",year:"2006"},
+  {id:15,title:"The Late Show",cat:"tvshow",img:"https://image.tmdb.org/t/p/w500/wwemzKWzjKYJFfCeiB57q3r4Bcm.jpg",link:"#",desc:"برنامج ترفيهي يومي.",year:"2015"},
+];
+
+if (allContent.length === 0) {
+  allContent = [...defaultContent];
+  saveContent();
+}
+
+function saveContent() { localStorage.setItem('yunflix_content', JSON.stringify(allContent)); }
+function saveFavs() { localStorage.setItem('yunflix_favs', JSON.stringify(favorites)); }
+
+// ===== LOGIN =====
+function loginWithGoogle() {
+  currentUser = { name: 'مستخدم Google', email: 'user@gmail.com', avatar: '👤' };
+  enterApp();
+}
+function loginManual() {
+  const e = document.getElementById('loginEmail').value;
+  const p = document.getElementById('loginPass').value;
+  if (!e || !p) { alert('الرجاء ملء جميع الحقول'); return; }
+  currentUser = { name: e.split('@')[0], email: e };
+  enterApp();
+}
+function enterApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appWrapper').style.display = 'block';
+  showPage('home');
+  renderAll();
+}
+
+// ===== PAGES =====
+const pageMap = {
+  home: 'homePage', movies: 'moviesPage', series: 'seriesPage',
+  tvshow: 'tvshowPage', anime: 'animePage', kids: 'kidsPage',
+  documentary: 'documentaryPage', search: 'searchPage',
+  favorites: 'favoritesPage', addfilm: 'addFilmPage'
+};
+
+function showPage(name) {
+  // Deactivate all
+  Object.values(pageMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  // Activate target
+  const target = pageMap[name];
+  if (target) {
+    const el = document.getElementById(target);
+    if (el) el.classList.add('active');
+  }
+  // Render specific
+  if (name === 'favorites') renderFavorites();
+  if (name === 'movies') renderCatGrid('moviesGrid','movie');
+  if (name === 'series') renderCatGrid('seriesGrid','series');
+  if (name === 'tvshow') renderCatGrid('tvshowGrid','tvshow');
+  if (name === 'anime') renderCatGrid('animeGrid','anime');
+  if (name === 'kids') renderCatGrid('kidsGrid','kids');
+  if (name === 'documentary') renderCatGrid('documentaryGrid','documentary');
+  window.scrollTo(0,0);
+}
+
+// ===== RENDER =====
+function renderAll() {
+  renderTop10('top10Movies', 'movie');
+  renderTop10('top10Series', 'series');
+  renderRecent();
+  // Hero
+  const movies = allContent.filter(c=>c.cat==='movie');
+  if (movies.length > 0) {
+    const h = movies[Math.floor(Math.random()*movies.length)];
+    document.getElementById('heroTitle').textContent = h.title;
+    document.getElementById('heroDesc').textContent = h.desc || '';
+  }
+}
+
+function renderTop10(containerId, cat) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const items = allContent.filter(c=>c.cat===cat).slice(0,10);
+  container.innerHTML = items.map((item,i)=>`
+    <div class="top10-card" onclick="openModal(${item.id})">
+      <img class="top10-img" src="${item.img}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/150x210/1a1a1a/808080?text=No+Image'">
+      <div class="top10-num">${i+1}</div>
+    </div>
+  `).join('');
+}
+
+function renderRecent() {
+  const container = document.getElementById('recentAdded');
+  if (!container) return;
+  const items = [...allContent].reverse().slice(0,12);
+  container.innerHTML = items.map(item => cardHtml(item)).join('');
+}
+
+function renderCatGrid(containerId, cat) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const items = allContent.filter(c=>c.cat===cat);
+  if (items.length === 0) {
+    container.innerHTML = '<p style="color:var(--gray);padding:20px;grid-column:1/-1">لا يوجد محتوى في هذا التصنيف بعد.</p>';
+    return;
+  }
+  container.innerHTML = items.map(item => cardHtml(item)).join('');
+}
+
+function cardHtml(item) {
+  const isFav = favorites.includes(item.id);
+  return `
+    <div class="movie-card">
+      <img src="${item.img}" alt="${item.title}" onclick="openModal(${item.id})" onerror="this.src='https://via.placeholder.com/180x250/1a1a1a/808080?text=No+Image'">
+      <div class="fav-badge ${isFav?'active':''}" onclick="toggleFav(${item.id},event)">${isFav?'❤':'🤍'}</div>
+      <div class="movie-card-info" onclick="openModal(${item.id})">
+        <div class="movie-card-title">${item.title}</div>
+        <div class="movie-card-meta">${item.year||''} • ${catLabel(item.cat)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function catLabel(cat) {
+  const m = {movie:'🎬 فيلم',series:'📺 مسلسل',tvshow:'📡 TV Show',anime:'⛩️ أنيمي',kids:'🧸 أطفال',documentary:'🌍 وثائقي'};
+  return m[cat]||cat;
+}
+
+// ===== FAVORITES =====
+function toggleFav(id, e) {
+  if (e) e.stopPropagation();
+  const idx = favorites.indexOf(id);
+  if (idx > -1) { favorites.splice(idx,1); showToast('تمت الإزالة من المفضلة'); }
+  else { favorites.push(id); showToast('تمت الإضافة إلى المفضلة ❤️'); }
+  saveFavs();
+  renderAll();
+}
+function toggleFavModal() {
+  if (!currentModalItem) return;
+  toggleFav(currentModalItem.id, null);
+  document.getElementById('modalFavBtn').textContent = favorites.includes(currentModalItem.id) ? '❤ إزالة من المفضلة' : '🤍 إضافة للمفضلة';
+}
+function renderFavorites() {
+  const container = document.getElementById('favContent');
+  if (!container) return;
+  const favItems = allContent.filter(c=>favorites.includes(c.id));
+  if (favItems.length===0) {
+    container.innerHTML = `<div class="fav-empty"><div class="big-icon">❤️</div><p>قائمة المفضلة فارغة<br>أضف أفلامك المفضلة بالضغط على ❤</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="fav-grid">${favItems.map(item=>cardHtml(item)).join('')}</div>`;
+}
+
+// ===== SEARCH =====
+function liveSearch(q) {
+  document.getElementById('bigSearchInput').value = q;
+  const query = q.toLowerCase().trim();
+  const grid = document.getElementById('searchGrid');
+  const label = document.getElementById('searchLabel');
+  if (!grid) return;
+  if (!query) { grid.innerHTML=''; label.textContent='ابحث عن أي شيء...'; return; }
+  const res = allContent.filter(c=>c.title.toLowerCase().includes(query)||c.desc?.toLowerCase().includes(query));
+  label.textContent = `${res.length} نتيجة لـ "${q}"`;
+  grid.innerHTML = res.map(item=>cardHtml(item)).join('');
+}
+
+// ===== MODAL =====
+function openModal(id) {
+  const item = allContent.find(c=>c.id===id);
+  if (!item) return;
+  currentModalItem = item;
+  document.getElementById('modalImg').src = item.img || '';
+  document.getElementById('modalTitle').textContent = item.title;
+  document.getElementById('modalDesc').textContent = item.desc || 'لا يوجد وصف';
+  document.getElementById('modalMeta').innerHTML = `<span class="modal-cat">${catLabel(item.cat)}</span><span>${item.year||''}</span>`;
+  document.getElementById('modalWatch').href = item.link||'#';
+  document.getElementById('modalFavBtn').textContent = favorites.includes(id) ? '❤ إزالة من المفضلة' : '🤍 إضافة للمفضلة';
+  document.getElementById('movieModal').classList.add('open');
+}
+function closeModal() { document.getElementById('movieModal').classList.remove('open'); }
+document.getElementById('movieModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+// ===== ADMIN =====
+function showAdminModal() {
+  document.getElementById('adminCodeModal').classList.add('open');
+  document.getElementById('adminCodeInput').value = '';
+  document.getElementById('codeError').style.display = 'none';
+  setTimeout(()=>document.getElementById('adminCodeInput').focus(), 100);
+}
+function closeAdminModal() {
+  document.getElementById('adminCodeModal').classList.remove('open');
+}
+function checkAdminCode() {
+  const val = document.getElementById('adminCodeInput').value;
+  if (val.length < 4) return;
+  if (val === '2010') {
+    closeAdminModal();
+    showPage('addfilm');
+  } else {
+    document.getElementById('codeError').style.display = 'block';
+    setTimeout(()=>{ closeAdminModal(); showPage('home'); }, 1500);
+  }
+}
+
+function publishContent() {
+  const title = document.getElementById('addTitle').value.trim();
+  const cat = document.getElementById('addCat').value;
+  const img = document.getElementById('addImg').value.trim();
+  const link = document.getElementById('addLink').value.trim();
+  const desc = document.getElementById('addDesc').value.trim();
+  const year = document.getElementById('addYear').value.trim();
+
+  if (!title||!cat||!img||!link) { alert('❌ الرجاء ملء جميع الحقول المطلوبة (*)'); return; }
+
+  const newItem = {
+    id: Date.now(),
+    title, cat, img, link, desc,
+    year: year || new Date().getFullYear().toString()
+  };
+  allContent.push(newItem);
+  saveContent();
+
+  // Reset form
+  ['addTitle','addImg','addLink','addDesc','addYear'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addCat').value='';
+
+  showToast('🎬 تم النشر بنجاح! سيظهر للجميع الآن');
+  renderAll();
+  setTimeout(()=>showPage('home'), 1200);
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ===== SCROLL =====
+window.addEventListener('scroll', ()=>{
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ===== SIDEBAR =====
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+</script>
+</body>
+</html>
